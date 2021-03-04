@@ -14,3 +14,22 @@ To install the projects, a few libraries are required.
 * boofuzz
 * ncclient
 * libyang-python
+
+Build instructions
+=================
+
+To build the project, it's best to use a python venv inside the project.
+
+```
+git clone git@lab.sartura.hr:sysrepo/yang-validation-fuzzer.git --recurse-submodules
+
+cd yang-validation-fuzzer
+
+python3 -m venv env
+
+source env/bin/activate
+
+pip3 install -r requirements.txt
+```
+
+
