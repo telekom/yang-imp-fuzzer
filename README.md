@@ -32,4 +32,12 @@ source env/bin/activate
 pip3 install -r requirements.txt
 ```
 
+Running the fuzzer
+=================
+
+To run the fuzzer, run the following command
+
+```
+python3 fuzzer/fuzzer.py --model-name ietf-system --model-namespace "urn:test"
+```
 
