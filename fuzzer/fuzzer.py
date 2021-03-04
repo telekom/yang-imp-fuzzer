@@ -50,8 +50,10 @@ class ModuleParser:
                     return self.parse_features(c)
         elif version == "1.1":
             #xml = self.conn.get().data_xml
-            xml = self.conn.get(filter=('xpath', 'ietf-yang-library:yang-library')).data_xml
-            print("xml = ", xml)
+            #xml = self.conn.get(filter=('xpath', 'ietf-yang-library:yang-library')).data_xml
+            #print("xml = ", xml)
+            print("Getting features for YANG 1.1 models isn't supported yet")
+            raise NotImplementedError
 
         return []
 
