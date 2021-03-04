@@ -1,2 +1,5 @@
+-r ./boofuzz-fork/requirements.txt
+
+-e ./boofuzz-fork
+
 libyang==1.6.1
-ncclient==0.6.9
