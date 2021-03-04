@@ -92,12 +92,17 @@ def parse_args():
     parser.add_argument('--model-name', dest='model_path', type=str, required=True, help='Path to the model to use for data generation')
     parser.add_argument('--model-namespace', dest='model_namespace', type=str, required=True, help='Namespace of model to use for data generation')
     parser.add_argument('--modules-directory', dest='modules_dir', type=str, default='/usr/share/yang/modules', help='Path to the directory with YANG modules')
+    parser.add_argument('--ip', dest='ip', type=str, default='172.17.0.2', help='NETCONF target server IP address')
+    parser.add_argument('--port', dest='port', type=int, default=830, help='NETCONF target server TCP port')
+    parser.add_argument('--user', dest='user', type=str, default='netconf', help='NETCONF target username')
+    parser.add_argument('--password', dest='password', type=str, default='netconf', help='NETCONF target password')
+    parser.add_argument('--datastore', dest='datastore', type=str, default='running', help='NETCONF target datastore to fuzz')
     return parser.parse_args()
 
 def main():
     args = parse_args()
 
-    conn = boofuzz.NETCONFConnection("172.17.0.2.", 830, "netconf", "netconf", "running")
+    conn = boofuzz.NETCONFConnection(args.ip, args.port, args.user, args.password, args.datastore)
     session = boofuzz.Session(target=boofuzz.Target(connection = conn))
 
     conn.open()
