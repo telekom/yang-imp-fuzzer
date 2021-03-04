@@ -1,0 +1,3 @@
+[submodule "boofuzz-fork"]
+	path = boofuzz-fork
+	url = https://lab.sartura.hr/sysrepo/boofuzz-fork.git
