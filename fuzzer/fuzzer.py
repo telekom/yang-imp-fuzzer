@@ -3,6 +3,8 @@
 import argparse
 import boofuzz
 import libyang
+import xmltodict
+import sys
 
 class ModuleParser:
     def __init__(self, modules_dir, module_path, namespace, capabilities, conn):
@@ -47,11 +49,18 @@ class ModuleParser:
                 if "?module=" + self.module.name() + "&" in c:
                     return self.parse_features(c)
         elif version == "1.1":
-            #xml = self.conn.get().data_xml
-            #xml = self.conn.get(filter=('xpath', 'ietf-yang-library:yang-library')).data_xml
-            #print("xml = ", xml)
-            print("Getting features for YANG 1.1 models isn't supported yet")
-            raise NotImplementedError
+            namespace = {"ly": "urn:ietf:params:xml:ns:yang:ietf-yang-library"}
+            select = "/ly:yang-library"
+            xml = self.conn.get(filter=("xpath", (namespace, select))).data_xml
+            modules = xmltodict.parse(xml)['data']['yang-library']['module-set']['module']
+            if self.module.name() not in [m['name'] for m in modules]:
+                sys.exit("module not found on remote server")
+            for m in modules:
+                if m['name'] == self.module.name():
+                    if isinstance(m['feature'], str):
+                        return [m['feature']]
+                    else:
+                        return m['feature']
 
         return []
 

@@ -3,3 +3,4 @@
 -e ./boofuzz-fork
 
 libyang==1.6.1
+xmltodict==0.12.0
