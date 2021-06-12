@@ -11,9 +11,6 @@ class ModuleParser:
         self.module_path = module_path
         self.namespace = namespace
         self.conn = conn
-        self.xml_template_start="""<?xml version="1.0" encoding="UTF-8"?>
-<data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0 xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">"""
-        self.xml_template_end="</data>\n"
 
         self.ctx = libyang.Context(modules_dir)
         self.module = self.ctx.load_module(module_path)
@@ -75,10 +72,7 @@ class ModuleParser:
         return features.split(",")
 
     def parse_module(self):
-        for c in self.module.children():
-            self.handle_child(c, 1, False)
-        xml = self.xml_template_start + self.xml_template_end
-        return xml.splitlines()
+        return [self.handle_child(c, 1, False) for c in self.module.children()]
 
     def handle_child(self, child, level, indent):
         if indent:
@@ -86,22 +80,26 @@ class ModuleParser:
         else:
             indentation = ""
 
+        res = ""
+
         if child.keyword() in ['container', 'list', 'rpc']:
             if level == 1:
-                self.xml_template_start += indentation + "<" + child.name() + " xmlns=\"" + self.namespace + "\">\n"
+                res += indentation + "<" + child.name() + " xmlns=\"" + self.namespace + "\">\n"
             else:
-                self.xml_template_start += indentation + "<" + child.name() + ">\n"
+                res += indentation + "<" + child.name() + ">\n"
             for c in child.children():
-                self.handle_child(c, level + 1, indent)
-            self.xml_template_start += indentation + "</" + child.name() + ">\n"
+                res += self.handle_child(c, level + 1, indent)
+            res += indentation + "</" + child.name() + ">\n"
         else:
-            self.xml_template_start += indentation + "<" + child.name() + ">\n"
+            res += indentation + "<" + child.name() + ">\n"
             if indent:
-                self.xml_template_start += indentation + "\tFUZZ\n"
+                res += indentation + "\tFUZZ\n"
             else:
-                self.xml_template_start += indentation + "FUZZ\n"
+                res += indentation + "FUZZ\n"
 
-            self.xml_template_start += indentation + "</" + child.name() + ">\n"
+            res += indentation + "</" + child.name() + ">\n"
+
+        return res
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Fuzz YANG model implementation validity on a remote NETCONF server")
@@ -125,20 +123,24 @@ def main():
     raw_conn = conn.get_raw_conn()
     capabilities = raw_conn.server_capabilities
     parser = ModuleParser(args.modules_dir, args.model_path, args.model_namespace, capabilities, raw_conn)
-    xml = parser.parse_module()
+    nodes = parser.parse_module()
     conn.close()
 
-    request_children = []
+    config_start = boofuzz.Static(default_value="""<nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">""")
+    config_end = boofuzz.Static(default_value="</nc:config>")
 
-    for line in xml:
-        if line == "FUZZ":
-            request_children.append(boofuzz.String(default_value=line))
-        else:
-            request_children.append(boofuzz.Static(default_value=line))
 
-    xml_request = boofuzz.Request("get-config", children=request_children)
+    for node in nodes:
+        request_children = [config_start]
+        for line in node.split('\n'):
+            if line == "FUZZ":
+                request_children.append(boofuzz.String(default_value=line))
+            else:
+                request_children.append(boofuzz.Static(default_value=line))
+        request_children.append(config_end)
 
-    session.connect(xml_request)
+        node_req = boofuzz.Request(node.split('\n')[0], children=request_children)
+        session.connect(node_req)
 
     session.fuzz()
 
