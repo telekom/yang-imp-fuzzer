@@ -75,12 +75,8 @@ class ModuleParser:
         return [self.handle_child(c, 1, False) for c in self.module.children()]
 
     def handle_child(self, child, level, indent):
-        if indent:
-            indentation = level * '\t'
-        else:
-            indentation = ""
-
         res = ""
+        indentation = level * indent * '\t'
 
         if child.keyword() in ['container', 'list', 'rpc']:
             if level == 1:
