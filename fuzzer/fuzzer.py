@@ -72,28 +72,23 @@ class ModuleParser:
         return features.split(",")
 
     def parse_module(self):
-        return [self.handle_child(c, 1, False) for c in self.module.children()]
+        return [self.handle_child(c, 1) for c in self.module.children()]
 
-    def handle_child(self, child, level, indent):
-        res = ""
-        indentation = level * indent * '\t'
+    def handle_child(self, child, level):
+        res = [] 
 
         if child.keyword() in ['container', 'list', 'rpc']:
             if level == 1:
-                res += indentation + "<" + child.name() + " xmlns=\"" + self.namespace + "\">\n"
+                res.append("<" + child.name() + " xmlns=\"" + self.namespace + "\">")
             else:
-                res += indentation + "<" + child.name() + ">\n"
+                res.append("<" + child.name() + ">")
             for c in child.children():
-                res += self.handle_child(c, level + 1, indent)
-            res += indentation + "</" + child.name() + ">\n"
+                res.extend(self.handle_child(c, level + 1))
+            res.append("</" + child.name() + ">")
         else:
-            res += indentation + "<" + child.name() + ">\n"
-            if indent:
-                res += indentation + "\tFUZZ\n"
-            else:
-                res += indentation + "FUZZ\n"
-
-            res += indentation + "</" + child.name() + ">\n"
+            res.append("<" + child.name() + ">")
+            res.append("FUZZ")
+            res.append("</" + child.name() + ">")
 
         return res
 
@@ -128,14 +123,14 @@ def main():
 
     for node in nodes:
         request_children = [config_start]
-        for line in node.split('\n'):
-            if line == "FUZZ":
-                request_children.append(boofuzz.String(default_value=line))
+        for element in node:
+            if element == "FUZZ":
+                request_children.append(boofuzz.String(default_value=element))
             else:
-                request_children.append(boofuzz.Static(default_value=line))
+                request_children.append(boofuzz.Static(default_value=element))
         request_children.append(config_end)
 
-        node_req = boofuzz.Request(node.split('\n')[0], children=request_children)
+        node_req = boofuzz.Request(node[0], children=request_children)
         session.connect(node_req)
 
     session.fuzz()
