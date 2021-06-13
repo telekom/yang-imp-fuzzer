@@ -102,8 +102,18 @@ class ModuleParser:
     def parse_data_node(self, node):
         res = []
         res.append(boofuzz.Static(default_value="<" + node.name() + ">"))
-        res.append(boofuzz.String(default_value=""))
+
+        if node.type().length() is not None:
+            length = node.type().length().split("..")
+            res.append(boofuzz.RandomData(default_value="FUZZ", min_length=length[0],max_length=length[1]))
+        elif node.type().range() is not None:
+            range = node.type().range().split("..")
+            res.append(boofuzz.RandomData(default_value="FUZZ", min_length=range[0],max_length=range[1]))
+        else:
+            res.append(boofuzz.String(default_value=""))
+
         res.append(boofuzz.Static(default_value="</" + node.name() + ">"))
+
         return res
 
     def parse_container_node(self, node, namespace):
