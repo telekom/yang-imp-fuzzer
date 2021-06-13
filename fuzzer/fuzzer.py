@@ -70,35 +70,58 @@ class ModuleParser:
         return features.split(",")
 
     def parse_module(self):
-        return [self.handle_child(c, 1) for c in self.module.children() if not c.config_false()]
+        return [self.parse_top_level_node(c) for c in self.module.children() if not c.config_false()]
 
-    def handle_child(self, child, level):
+    def parse_top_level_node(self, node):
         config_start = boofuzz.Static(default_value="""<nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">""")
         config_end = boofuzz.Static(default_value="</nc:config>")
         res = [] 
 
-        if child.keyword() in ['container', 'list', 'rpc']:
-            if level == 1:
-                res.append(config_start)
-                res.append(boofuzz.Static(default_value="<" + child.name() + " xmlns=\"" + self.namespace + "\">"))
-            else:
-                res.append(boofuzz.Static(default_value="<" + child.name() + ">"))
-            for c in child.children():
-                if c.config_false():
-                    continue
-                res.extend(self.handle_child(c, level + 1))
-            res.append(boofuzz.Static(default_value="</" + child.name() + ">"))
+        if node.keyword() in ['container', 'list', 'rpc']:
+            res.append(config_start)
+            res.extend(self.parse_container_node(node, True))
         else:
-            res.append(boofuzz.Static(default_value="<" + child.name() + ">"))
-            res.append(boofuzz.String(default_value=""))
-            res.append(boofuzz.Static(default_value="</" + child.name() + ">"))
+            res.extend(self.parse_data_node(node))
 
-        if level == 1:
-            res.append(config_end)
-            node = boofuzz.Request(child.name(), children=res)
-            return node
+        res.append(config_end)
+        node = boofuzz.Request(node.name(), children=res)
+        return node
+
+    def parse_nested_node(self, node):
+        config_start = boofuzz.Static(default_value="""<nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">""")
+        config_end = boofuzz.Static(default_value="</nc:config>")
+        res = [] 
+
+        if node.keyword() in ['container', 'list', 'rpc']:
+            res.extend(self.parse_container_node(node, False))
         else:
-            return res
+            res.extend(self.parse_data_node(node))
+
+        return res
+
+    def parse_data_node(self, node):
+        res = []
+        res.append(boofuzz.Static(default_value="<" + node.name() + ">"))
+        res.append(boofuzz.String(default_value=""))
+        res.append(boofuzz.Static(default_value="</" + node.name() + ">"))
+        return res
+
+    def parse_container_node(self, node, namespace):
+        res = []
+
+        if namespace:
+            res.append(boofuzz.Static(default_value="<" + node.name() + " xmlns=\"" + self.namespace + "\">"))
+        else:
+            res.append(boofuzz.Static(default_value="<" + node.name() + ">"))
+
+        for c in node.children():
+            if c.config_false():
+                continue
+            res.extend(self.parse_nested_node(c))
+
+        res.append(boofuzz.Static(default_value="</" + node.name() + ">"))
+
+        return res
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Fuzz YANG model implementation validity on a remote NETCONF server")
