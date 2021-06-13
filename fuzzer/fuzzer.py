@@ -37,8 +37,6 @@ class ModuleParser:
                     if elements[1] == "1.1;":
                         return "1.1"
         return "1.0"
-                    
-
 
     def get_enabled_features(self, capabilities, version):
         if version == "1.0":
@@ -72,25 +70,35 @@ class ModuleParser:
         return features.split(",")
 
     def parse_module(self):
-        return [self.handle_child(c, 1) for c in self.module.children()]
+        return [self.handle_child(c, 1) for c in self.module.children() if not c.config_false()]
 
     def handle_child(self, child, level):
+        config_start = boofuzz.Static(default_value="""<nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">""")
+        config_end = boofuzz.Static(default_value="</nc:config>")
         res = [] 
 
         if child.keyword() in ['container', 'list', 'rpc']:
             if level == 1:
-                res.append("<" + child.name() + " xmlns=\"" + self.namespace + "\">")
+                res.append(config_start)
+                res.append(boofuzz.Static(default_value="<" + child.name() + " xmlns=\"" + self.namespace + "\">"))
             else:
-                res.append("<" + child.name() + ">")
+                res.append(boofuzz.Static(default_value="<" + child.name() + ">"))
             for c in child.children():
+                if c.config_false():
+                    continue
                 res.extend(self.handle_child(c, level + 1))
-            res.append("</" + child.name() + ">")
+            res.append(boofuzz.Static(default_value="</" + child.name() + ">"))
         else:
-            res.append("<" + child.name() + ">")
-            res.append("FUZZ")
-            res.append("</" + child.name() + ">")
+            res.append(boofuzz.Static(default_value="<" + child.name() + ">"))
+            res.append(boofuzz.String(default_value=""))
+            res.append(boofuzz.Static(default_value="</" + child.name() + ">"))
 
-        return res
+        if level == 1:
+            res.append(config_end)
+            node = boofuzz.Request(child.name(), children=res)
+            return node
+        else:
+            return res
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Fuzz YANG model implementation validity on a remote NETCONF server")
@@ -117,21 +125,8 @@ def main():
     nodes = parser.parse_module()
     conn.close()
 
-    config_start = boofuzz.Static(default_value="""<nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">""")
-    config_end = boofuzz.Static(default_value="</nc:config>")
-
-
     for node in nodes:
-        request_children = [config_start]
-        for element in node:
-            if element == "FUZZ":
-                request_children.append(boofuzz.String(default_value=element))
-            else:
-                request_children.append(boofuzz.Static(default_value=element))
-        request_children.append(config_end)
-
-        node_req = boofuzz.Request(node[0], children=request_children)
-        session.connect(node_req)
+        session.connect(node)
 
     session.fuzz()
 
