@@ -272,12 +272,13 @@ class UInt64(Int):
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 yang_boofuzz_map = {libyang.Type.INT8: Int8,
-			libyang.Type.INT16: Int16,
-			libyang.Type.INT32: Int32,
-			libyang.Type.INT64: Int64,
-			libyang.Type.STRING: String,
-			libyang.Type.UINT8: UInt8,
-			libyang.Type.UINT16: UInt16,
-			libyang.Type.UINT32: UInt32,
-			libyang.Type.UINT64: UInt64
+            libyang.Type.INT16: Int16,
+            libyang.Type.INT32: Int32,
+            libyang.Type.INT64: Int64,
+            libyang.Type.STRING: String,
+            libyang.Type.UNION: boofuzz.RandomData,
+            libyang.Type.UINT8: UInt8,
+            libyang.Type.UINT16: UInt16,
+            libyang.Type.UINT32: UInt32,
+            libyang.Type.UINT64: UInt64
 }
