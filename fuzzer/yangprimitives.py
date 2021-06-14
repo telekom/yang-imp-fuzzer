@@ -138,6 +138,46 @@ class Int64(Int):
         super(Int64, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
+class String(boofuzz.Fuzzable):
+    def __init__(
+            self,
+            name=None,
+            default_value="",
+            min_val=0,
+            max_val=1,
+            max_mutations=1000,
+            seed=None,
+            *args,
+            **kwargs
+    ):
+        super(String, self).__init__(name=name, default_value=str(default_value), *args, **kwargs)
+
+        self.min_val = min_val
+        self.max_val = max_val
+        self.max_mutations = max_mutations
+        self.seed = seed
+
+    def mutations(self, default_value):
+        last_vale = None
+        if self.seed is not None:
+            random.seed(self.seed)
+
+        for i in range(self.max_mutations):
+            if i == 0:
+                current_val = default_value
+            else:
+                len = random.randint(self.min_val, self.max_val)
+                current_val = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=len))
+
+            if last_val == current_val:
+                continue
+
+            last_val = current_val
+            yield current_val
+
+    def encode (self, value, mutation_context=None):
+        return value.encode()
+
 class UInt8(Int):
     uint8_max = 2 ** 8 - 1
     uint8_min = 0

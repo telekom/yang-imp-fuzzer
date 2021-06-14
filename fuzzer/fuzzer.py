@@ -109,6 +109,7 @@ class ModuleParser:
                     libyang.Type.INT16: yangprimitives.Int16,
                     libyang.Type.INT32: yangprimitives.Int32,
                     libyang.Type.INT64: yangprimitives.Int64,
+                    libyang.Type.STRING: yangprimitives.String,
                     libyang.Type.UINT8: yangprimitives.UInt8,
                     libyang.Type.UINT16: yangprimitives.UInt16,
                     libyang.Type.UINT32: yangprimitives.UInt32,
