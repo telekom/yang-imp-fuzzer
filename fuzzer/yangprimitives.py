@@ -58,6 +58,16 @@ class Int8(Int):
             *args,
             **kwargs
     ):
+        if min_val == "min":
+            min_val = Int8.int8_min
+        else:
+            min_val = int(min_val)
+
+        if max_val == "max":
+            max_val = Int8.int8_max
+        else:
+            max_val = int(max_val)
+
         if min_val < Int8.int8_min:
             raise ValueError("min value too low for int8 type")
 
@@ -82,6 +92,16 @@ class Int16(Int):
             *args,
             **kwargs
     ):
+        if min_val == "min":
+            min_val = Int16.int16_min
+        else:
+            min_val = int(min_val)
+
+        if max_val == "max":
+            max_val = Int16.int16_max
+        else:
+            max_val = int(max_val)
+
         if min_val < Int16.int16_min:
             raise ValueError("min value too low for int16 type")
 
@@ -106,6 +126,16 @@ class Int32(Int):
             *args,
             **kwargs
     ):
+        if min_val == "min":
+            min_val = Int32.int32_min
+        else:
+            min_val = int(min_val)
+
+        if max_val == "max":
+            max_val = Int32.int32_max
+        else:
+            max_val = int(max_val)
+
         if min_val < Int32.int32_min:
             raise ValueError("min value too low for int32 type")
 
@@ -130,6 +160,16 @@ class Int64(Int):
             *args,
             **kwargs
     ):
+        if min_val == "min":
+            min_val = Int64.int64_min
+        else:
+            min_val = int(min_val)
+
+        if max_val == "max":
+            max_val = Int64.int64_max
+        else:
+            max_val = int(max_val)
+
         if min_val < Int64.int64_min:
             raise ValueError("min value too low for int64 type")
 
@@ -194,6 +234,16 @@ class UInt8(Int):
             *args,
             **kwargs
     ):
+        if min_val == "min":
+            min_val = UInt8.uint8_min
+        else:
+            min_val = int(min_val)
+
+        if max_val == "max":
+            max_val = UInt8.uint8_max
+        else:
+            max_val = int(max_val)
+
         if min_val < UInt8.uint8_min:
             raise ValueError("min value too low for uint8 type")
         if max_val > UInt8.uint8_max:
@@ -217,6 +267,16 @@ class UInt16(Int):
             *args,
             **kwargs
     ):
+        if min_val == "min":
+            min_val = UInt16.uint16_min
+        else:
+            min_val = int(min_val)
+
+        if max_val == "max":
+            max_val = UInt16.uint16_max
+        else:
+            max_val = int(max_val)
+
         if min_val < UInt16.uint16_min:
             raise ValueError("min value too low for uint16 type")
         if max_val > UInt16.uint16_max:
@@ -240,6 +300,16 @@ class UInt32(Int):
             *args,
             **kwargs
     ):
+        if min_val == "min":
+            min_val = UInt32.uint32_min
+        else:
+            min_val = int(min_val)
+
+        if max_val == "max":
+            max_val = UInt32.uint32_max
+        else:
+            max_val = int(max_val)
+
         if min_val < UInt32.uint32_min:
             raise ValueError("min value too low for uint32 type")
         if max_val > UInt32.uint32_max:
@@ -263,6 +333,16 @@ class UInt64(Int):
             *args,
             **kwargs
     ):
+        if min_val == "min":
+            min_val = UInt64.uint64_min
+        else:
+            min_val = int(min_val)
+
+        if max_val == "max":
+            max_val = UInt64.uint64_max
+        else:
+            max_val = int(max_val)
+
         if min_val < UInt64.uint64_min:
             raise ValueError("min value too low for uint64 type")
         if max_val > UInt64.uint64_max:
