@@ -23,7 +23,7 @@ class Int(boofuzz.Fuzzable):
         self.seed = seed
 
     def mutations(self, default_value):
-        last_vale = None
+        last_val = None
         if self.seed is not None:
             random.seed(self.seed)
         
@@ -194,8 +194,8 @@ class String(boofuzz.Fuzzable):
     ):
         super(String, self).__init__(name=name, default_value=str(default_value), *args, **kwargs)
 
-        self.min_val = min_val
-        self.max_val = max_val
+        self.min_val = int(min_val)
+        self.max_val = int(max_val)
         self.max_mutations = max_mutations
         self.seed = seed
 
