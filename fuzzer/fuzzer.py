@@ -102,17 +102,38 @@ class ModuleParser:
 
     def parse_data_node(self, node):
         res = []
+        max_val = None
+        min_val = None
+
+        yang_types = {libyang.Type.INT8: yangprimitives.Int8,
+                    libyang.Type.INT16: yangprimitives.Int16,
+                    libyang.Type.INT32: yangprimitives.Int32,
+                    libyang.Type.INT64: yangprimitives.Int64,
+                    libyang.Type.UINT8: yangprimitives.UInt8,
+                    libyang.Type.UINT16: yangprimitives.UInt16,
+                    libyang.Type.UINT32: yangprimitives.UInt32,
+                    libyang.Type.UINT64: yangprimitives.UInt64
+        }
+
         res.append(boofuzz.Static(default_value="<" + node.name() + ">"))
 
-        if node.type().length() is not None:
-            length = node.type().length().split("..")
-            res.append(boofuzz.RandomData(default_value="FUZZ", min_length=length[0],max_length=length[1]))
-        elif node.type().range() is not None:
-            range = node.type().range().split("..")
-            res.append(boofuzz.RandomData(default_value="FUZZ", min_length=range[0],max_length=range[1]))
-        else:
-            res.append(boofuzz.String(default_value=""))
+        node_type = node.type()
 
+        if node_type.length() is not None:
+            length = node_type.length().split("..")
+            min_val = length[0]
+            max_val = length[1]
+        elif node_type.range() is not None:
+            length = node_type.range().split("..")
+            min_val = length[0]
+            max_val = length[1]
+
+        if min_val and max_val:
+            res.append(yang_types[node_type.base()](i_min=min_val, i_max=max_val))
+        else:
+            res.append(yang_types[node_type.base()]())
+
+        res.append(boofuzz.String(default_value=""))
         res.append(boofuzz.Static(default_value="</" + node.name() + ">"))
 
         return res
