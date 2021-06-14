@@ -129,7 +129,7 @@ class ModuleParser:
             max_val = length[1]
 
         if min_val and max_val:
-            res.append(yang_types[node_type.base()](i_min=min_val, i_max=max_val))
+            res.append(yang_types[node_type.base()](min_val=min_val, max_val=max_val))
         else:
             res.append(yang_types[node_type.base()]())
 

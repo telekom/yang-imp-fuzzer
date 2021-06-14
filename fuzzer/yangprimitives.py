@@ -6,8 +6,8 @@ class Int(boofuzz.Fuzzable):
             self,
             name=None,
             default_value=0,
-            i_min=0
-            i_max=1
+            min_val=0,
+            max_val=1,
             max_mutations=1000,
             seed=None,
             *args,
@@ -15,8 +15,8 @@ class Int(boofuzz.Fuzzable):
     ):
         super(Int, self).__init__(name=name, default_value=str(default_value), *args, **kwargs)
 
-        self.i_min = i_min
-        self.i_max = i_max
+        self.min_val = min_val
+        self.max_val = max_val
         self.max_mutations = max_mutations
         self.seed = seed
 
@@ -29,7 +29,7 @@ class Int(boofuzz.Fuzzable):
             if i == 0:
                 current_val = default_value
             else:
-                current_val = random.randint(self.i_min, self.i_max)
+                current_val = random.randint(self.min_val, self.max_val)
 
             current_val = str(current_val)
 
@@ -50,20 +50,20 @@ class Int8(Int):
             self,
             name=None,
             default_value=0,
-            i_min=Int8.int8_min,
-            i_max=Int8.int8_max,
+            min_val=int8_min,
+            max_val=int8_max,
             max_mutations=1000,
             seed=None,
             *args,
             **kwargs
     ):
-        if i_min < Int8.int8_min:
+        if min_val < Int8.int8_min:
             raise ValueError("min value too low for int8 type")
 
-        if i_max > Int8.int8_max:
+        if max_val > Int8.int8_max:
             raise ValueError("max value too big for int8 type")
 
-        super(Int8, self).__init__(name=name, default_value=str(default_value), i_min=i_min, i_max=i_max,
+        super(Int8, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class Int16(Int):
@@ -74,20 +74,20 @@ class Int16(Int):
             self,
             name=None,
             default_value=0,
-            i_min=Int16.int16_min,
-            i_max=Int16.int16_max,
+            min_val=int16_min,
+            max_val=int16_max,
             max_mutations=1000,
             seed=None,
             *args,
             **kwargs
     ):
-        if i_min < Int16.int16_min:
+        if min_val < Int16.int16_min:
             raise ValueError("min value too low for int16 type")
 
-        if i_max > Int16.int16_max:
+        if max_val > Int16.int16_max:
             raise ValueError("max value too big for int16 type")
 
-        super(Int16, self).__init__(name=name, default_value=str(default_value), i_min=i_min, i_max=i_max,
+        super(Int16, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class Int32(Int):
@@ -98,20 +98,20 @@ class Int32(Int):
             self,
             name=None,
             default_value=0,
-            i_min=Int32.int32_min,
-            i_max=Int32.int32_max,
+            min_val=int32_min,
+            max_val=int32_max,
             max_mutations=1000,
             seed=None,
             *args,
             **kwargs
     ):
-        if i_min < Int32.int32_min:
+        if min_val < Int32.int32_min:
             raise ValueError("min value too low for int32 type")
 
-        if i_max > Int32.int32_max:
+        if max_val > Int32.int32_max:
             raise ValueError("max value too big for int32 type")
 
-        super(Int32, self).__init__(name=name, default_value=str(default_value), i_min=i_min, i_max=i_max,
+        super(Int32, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class Int64(Int):
@@ -122,20 +122,20 @@ class Int64(Int):
             self,
             name=None,
             default_value=0,
-            i_min=Int64.int64_min,
-            i_max=Int64.int64_max,
+            min_val=int64_min,
+            max_val=int64_max,
             max_mutations=1000,
             seed=None,
             *args,
             **kwargs
     ):
-        if i_min < Int64.int64_min:
+        if min_val < Int64.int64_min:
             raise ValueError("min value too low for int64 type")
 
-        if i_max > Int64.int64_max:
+        if max_val > Int64.int64_max:
             raise ValueError("max value too big for int64 type")
 
-        super(Int64, self).__init__(name=name, default_value=str(default_value), i_min=i_min, i_max=i_max,
+        super(Int64, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class UInt8(Int):
@@ -146,19 +146,19 @@ class UInt8(Int):
             self,
             name=None,
             default_value=0,
-            i_min=UInt8.uint8_min,
-            i_max=UInt8.uint8_max,
+            min_val=uint8_min,
+            max_val=uint8_max,
             max_mutations=1000,
             seed=None,
             *args,
             **kwargs
     ):
-        if i_min < UInt8.uint8_min:
+        if min_val < UInt8.uint8_min:
             raise ValueError("min value too low for uint8 type")
-        if i_max > UInt8.uint8_max:
+        if max_val > UInt8.uint8_max:
             raise ValueError("max value too big for uint8 type")
 
-        super(UInt8, self).__init__(name=name, default_value=str(default_value), i_min=i_min, i_max=i_max,
+        super(UInt8, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class UInt16(Int):
@@ -169,19 +169,19 @@ class UInt16(Int):
             self,
             name=None,
             default_value=0,
-            i_min=UInt16.uint16_min,
-            i_max=UInt16.uint16_max,
+            min_val=uint16_min,
+            max_val=uint16_max,
             max_mutations=1000,
             seed=None,
             *args,
             **kwargs
     ):
-        if i_min < UInt16.uint16_min:
+        if min_val < UInt16.uint16_min:
             raise ValueError("min value too low for uint16 type")
-        if i_max > UInt16.uint16_max:
+        if max_val > UInt16.uint16_max:
             raise ValueError("max value too big for uint16 type")
 
-        super(UInt16, self).__init__(name=name, default_value=str(default_value), i_min=i_min, i_max=i_max,
+        super(UInt16, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class UInt32(Int):
@@ -192,19 +192,19 @@ class UInt32(Int):
             self,
             name=None,
             default_value=0,
-            i_min=UInt32.uint32_min,
-            i_max=UInt32.uint32_max,
+            min_val=uint32_min,
+            max_val=uint32_max,
             max_mutations=1000,
             seed=None,
             *args,
             **kwargs
     ):
-        if i_min < UInt32.uint32_min:
+        if min_val < UInt32.uint32_min:
             raise ValueError("min value too low for uint32 type")
-        if i_max > UInt32.uint32_max:
+        if max_val > UInt32.uint32_max:
             raise ValueError("max value too big for uint32 type")
 
-        super(UInt32, self).__init__(name=name, default_value=str(default_value), i_min=i_min, i_max=i_max,
+        super(UInt32, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class UInt64(Int):
@@ -215,17 +215,17 @@ class UInt64(Int):
             self,
             name=None,
             default_value=0,
-            i_min=UInt64.uint64_min,
-            i_max=UInt64.uint64_max,
+            min_val=uint64_min,
+            max_val=uint64_max,
             max_mutations=1000,
             seed=None,
             *args,
             **kwargs
     ):
-        if i_min < UInt64.uint64_min:
+        if min_val < UInt64.uint64_min:
             raise ValueError("min value too low for uint64 type")
-        if i_max > UInt64.uint64_max:
+        if max_val > UInt64.uint64_max:
             raise ValueError("max value too big for uint64 type")
 
-        super(UInt64, self).__init__(name=name, default_value=str(default_value), i_min=i_min, i_max=i_max,
+        super(UInt64, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
