@@ -105,17 +105,6 @@ class ModuleParser:
         max_val = None
         min_val = None
 
-        yang_types = {libyang.Type.INT8: yangprimitives.Int8,
-                    libyang.Type.INT16: yangprimitives.Int16,
-                    libyang.Type.INT32: yangprimitives.Int32,
-                    libyang.Type.INT64: yangprimitives.Int64,
-                    libyang.Type.STRING: yangprimitives.String,
-                    libyang.Type.UINT8: yangprimitives.UInt8,
-                    libyang.Type.UINT16: yangprimitives.UInt16,
-                    libyang.Type.UINT32: yangprimitives.UInt32,
-                    libyang.Type.UINT64: yangprimitives.UInt64
-        }
-
         res.append(boofuzz.Static(default_value="<" + node.name() + ">"))
 
         node_type = node.type()
@@ -130,9 +119,9 @@ class ModuleParser:
             max_val = length[1]
 
         if min_val and max_val:
-            res.append(yang_types[node_type.base()](min_val=min_val, max_val=max_val))
+            res.append(yangprimitives.yang_boofuzz_map[node_type.base()](min_val=min_val, max_val=max_val))
         else:
-            res.append(yang_types[node_type.base()]())
+            res.append(yangprimitives.yang_boofuzz_map[node_type.base()]())
 
         res.append(boofuzz.String(default_value=""))
         res.append(boofuzz.Static(default_value="</" + node.name() + ">"))
@@ -188,5 +177,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
