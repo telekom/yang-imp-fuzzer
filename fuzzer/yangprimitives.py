@@ -1,6 +1,7 @@
 import boofuzz
 import random
 import libyang
+import string
 
 class Int(boofuzz.Fuzzable):
     def __init__(
@@ -199,7 +200,7 @@ class String(boofuzz.Fuzzable):
         self.seed = seed
 
     def mutations(self, default_value):
-        last_vale = None
+        last_val = None
         if self.seed is not None:
             random.seed(self.seed)
 
