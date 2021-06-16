@@ -7,7 +7,7 @@ class Int(boofuzz.Fuzzable):
     def __init__(
             self,
             name=None,
-            default_value=0,
+            default_value=None,
             min_val=0,
             max_val=1,
             max_mutations=1000,
@@ -15,12 +15,16 @@ class Int(boofuzz.Fuzzable):
             *args,
             **kwargs
     ):
-        super(Int, self).__init__(name=name, default_value=str(default_value), *args, **kwargs)
-
         self.min_val = min_val
         self.max_val = max_val
         self.max_mutations = max_mutations
         self.seed = seed
+        self.default_value = default_value
+        if default_value is None:
+            self.default_value = random.randint(self.min_val, self.max_val)
+
+        super(Int, self).__init__(name=name, default_value=str(self.default_value), *args, **kwargs)
+
 
     def mutations(self, default_value):
         last_val = None
@@ -51,7 +55,7 @@ class Int8(Int):
     def __init__(
             self,
             name=None,
-            default_value=0,
+            default_value=None,
             min_val=int8_min,
             max_val=int8_max,
             max_mutations=1000,
@@ -75,7 +79,7 @@ class Int8(Int):
         if max_val > Int8.int8_max:
             raise ValueError("max value too big for int8 type")
 
-        super(Int8, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
+        super(Int8, self).__init__(name=name, default_value=default_value, min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class Int16(Int):
@@ -85,7 +89,7 @@ class Int16(Int):
     def __init__(
             self,
             name=None,
-            default_value=0,
+            default_value=None,
             min_val=int16_min,
             max_val=int16_max,
             max_mutations=1000,
@@ -109,7 +113,7 @@ class Int16(Int):
         if max_val > Int16.int16_max:
             raise ValueError("max value too big for int16 type")
 
-        super(Int16, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
+        super(Int16, self).__init__(name=name, default_value=default_value, min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class Int32(Int):
@@ -119,7 +123,7 @@ class Int32(Int):
     def __init__(
             self,
             name=None,
-            default_value=0,
+            default_value=None,
             min_val=int32_min,
             max_val=int32_max,
             max_mutations=1000,
@@ -143,7 +147,7 @@ class Int32(Int):
         if max_val > Int32.int32_max:
             raise ValueError("max value too big for int32 type")
 
-        super(Int32, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
+        super(Int32, self).__init__(name=name, default_value=default_value, min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class Int64(Int):
@@ -153,7 +157,7 @@ class Int64(Int):
     def __init__(
             self,
             name=None,
-            default_value=0,
+            default_value=None,
             min_val=int64_min,
             max_val=int64_max,
             max_mutations=1000,
@@ -177,27 +181,34 @@ class Int64(Int):
         if max_val > Int64.int64_max:
             raise ValueError("max value too big for int64 type")
 
-        super(Int64, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
+        super(Int64, self).__init__(name=name, default_value=default_value, min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class String(boofuzz.Fuzzable):
     def __init__(
             self,
             name=None,
-            default_value="",
-            min_val=0,
-            max_val=1,
-            max_mutations=1000,
+            default_value=None,
+            min_val=10,
+            max_val=256,
+            max_mutations=1,
             seed=None,
             *args,
             **kwargs
     ):
-        super(String, self).__init__(name=name, default_value=str(default_value), *args, **kwargs)
-
         self.min_val = int(min_val)
         self.max_val = int(max_val)
         self.max_mutations = max_mutations
         self.seed = seed
+
+        self.default_value = default_value
+        if default_value is None:
+            len = random.randint(self.min_val, self.max_val)
+            self.default_value= ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=len))
+
+        super(String, self).__init__(name=name, default_value=self.default_value, *args, **kwargs)
+
+
 
     def mutations(self, default_value):
         last_val = None
@@ -227,7 +238,7 @@ class UInt8(Int):
     def __init__(
             self,
             name=None,
-            default_value=0,
+            default_value=None,
             min_val=uint8_min,
             max_val=uint8_max,
             max_mutations=1000,
@@ -250,7 +261,7 @@ class UInt8(Int):
         if max_val > UInt8.uint8_max:
             raise ValueError("max value too big for uint8 type")
 
-        super(UInt8, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
+        super(UInt8, self).__init__(name=name, default_value=default_value, min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class UInt16(Int):
@@ -260,7 +271,7 @@ class UInt16(Int):
     def __init__(
             self,
             name=None,
-            default_value=0,
+            default_value=None,
             min_val=uint16_min,
             max_val=uint16_max,
             max_mutations=1000,
@@ -283,7 +294,7 @@ class UInt16(Int):
         if max_val > UInt16.uint16_max:
             raise ValueError("max value too big for uint16 type")
 
-        super(UInt16, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
+        super(UInt16, self).__init__(name=name, default_value=default_value, min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class UInt32(Int):
@@ -293,7 +304,7 @@ class UInt32(Int):
     def __init__(
             self,
             name=None,
-            default_value=0,
+            default_value=None,
             min_val=uint32_min,
             max_val=uint32_max,
             max_mutations=1000,
@@ -316,7 +327,7 @@ class UInt32(Int):
         if max_val > UInt32.uint32_max:
             raise ValueError("max value too big for uint32 type")
 
-        super(UInt32, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
+        super(UInt32, self).__init__(name=name, default_value=default_value, min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 class UInt64(Int):
@@ -326,7 +337,7 @@ class UInt64(Int):
     def __init__(
             self,
             name=None,
-            default_value=0,
+            default_value=None,
             min_val=uint64_min,
             max_val=uint64_max,
             max_mutations=1000,
@@ -349,7 +360,7 @@ class UInt64(Int):
         if max_val > UInt64.uint64_max:
             raise ValueError("max value too big for uint64 type")
 
-        super(UInt64, self).__init__(name=name, default_value=str(default_value), min_val=min_val, max_val=max_val,
+        super(UInt64, self).__init__(name=name, default_value=default_value, min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
 yang_boofuzz_map = {libyang.Type.INT8: Int8,
