@@ -206,8 +206,10 @@ class String(boofuzz.Fuzzable):
         self.default_value = default_value
         if default_value is None:
             if patterns:
-                print(patterns[0])
-                self.default_value = exrex.getone(patterns[0])
+                pattern = r'{}'.format(patterns[0])
+                pattern = pattern.replace("\\p{L}", "[a-zA-z]")
+                pattern = pattern.replace("\\p{N}", "\d")
+                self.default_value = exrex.getone(pattern)
             else:
                 str_len = random.randint(self.min_val, self.max_val)
                 self.default_value= ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=str_len))
@@ -226,7 +228,10 @@ class String(boofuzz.Fuzzable):
                 current_val = default_value
             else:
                 if patterns:
-                    current_val = exrex.getone(patterns[0])
+                    pattern = r'{}'.format(patterns[0])
+                    pattern = pattern.replace("\\p{L}", "[a-zA-z]")
+                    pattern = pattern.replace("\\p{N}", "\d")
+                    current_val = exrex.getone(pattern)
                 else:
                     str_len = random.randint(self.min_val, self.max_val)
                     current_val = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=str_len))
