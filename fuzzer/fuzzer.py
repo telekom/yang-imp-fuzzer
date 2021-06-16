@@ -100,43 +100,6 @@ class ModuleParser:
 
         return res
 
-    def parse_data_node(self, node):
-        res = []
-        max_val = None
-        min_val = None
-        patterns = None
-
-        res.append(boofuzz.Static(name=node.name() + "start", default_value="<" + node.name() + ">"))
-
-        node_type = node.type()
-
-        if node_type.length() is not None:
-            length = node_type.length().split("..")
-            min_val = length[0]
-            max_val = length[1]
-        elif node_type.range() is not None:
-            length = node_type.range().split("..")
-            min_val = length[0]
-            max_val = length[1]
-
-        if any(node_type.patterns()):
-            patterns = list(node_type.patterns())[0]
-
-        if min_val and max_val:
-            if patterns:
-                res.append(yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data", min_val=min_val, max_val=max_val, patterns=patterns))
-            else:
-                res.append(yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data", min_val=min_val, max_val=max_val))
-        else:
-            if patterns:
-                res.append(yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data", patterns=patterns))
-            else:
-                res.append(yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data"))
-
-        res.append(boofuzz.Static(name=node.name() + "end", default_value="</" + node.name() + ">"))
-
-        return res
-
     def parse_container_node(self, node, namespace):
         res = []
 
@@ -153,6 +116,50 @@ class ModuleParser:
         res.append(boofuzz.Static(default_value="</" + node.name() + ">"))
 
         return res
+
+    def parse_data_node(self, node):
+        res = []
+
+        res.append(boofuzz.Static(name=node.name() + "start", default_value="<" + node.name() + ">"))
+        res.append(self.handle_data_node_type(node))
+
+        res.append(boofuzz.Static(name=node.name() + "end", default_value="</" + node.name() + ">"))
+
+        return res
+
+    def handle_data_node_type(self, node):
+        node_type = node.type()
+        max_val, min_val, patterns = self.handle_data_restriction_stmts(node_type)
+
+        if min_val and max_val:
+            if patterns:
+                return yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data", min_val=min_val, max_val=max_val, patterns=patterns)
+            else:
+                return yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data", min_val=min_val, max_val=max_val)
+        else:
+            if patterns:
+                return yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data", patterns=patterns)
+            else:
+                return yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data")
+
+    def handle_data_restriction_stmts(self, node_type):
+        max_val = None
+        min_val = None
+        patterns = None
+
+        if node_type.length() is not None:
+            length = node_type.length().split("..")
+            min_val = length[0]
+            max_val = length[1]
+        elif node_type.range() is not None:
+            length = node_type.range().split("..")
+            min_val = length[0]
+            max_val = length[1]
+
+        if any(node_type.patterns()):
+            patterns = list(node_type.patterns())[0]
+
+        return max_val, min_val, patterns
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Fuzz YANG model implementation validity on a remote NETCONF server")
