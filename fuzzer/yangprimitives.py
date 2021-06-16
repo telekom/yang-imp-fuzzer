@@ -381,14 +381,16 @@ class Union(boofuzz.Fuzzable):
     def __init__(
         self,
         name=None,
-        children=[],
         seed=None,
+        children=[],
         *args,
         **kwargs
     ):
 
         self.children = children
-        super(Union, self).__init__(name=name, *args, **kwargs)
+        child = random.choice(self.children)
+        self.default_value = child.default_value
+        super(Union, self).__init__(name=name, default_value=self.default_value, *args, **kwargs)
 
     def mutations(self, default_value):
         child = random.choice(self.children)
