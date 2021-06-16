@@ -206,10 +206,10 @@ class String(boofuzz.Fuzzable):
         self.default_value = default_value
         if default_value is None:
             if patterns:
-                self.default_value = exrex.getone(patterns[0], limit=self.max_val)
+                self.default_value = exrex.getone(patterns[0])
             else:
-                len = random.randint(self.min_val, self.max_val)
-                self.default_value= ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=len))
+                str_len = random.randint(self.min_val, self.max_val)
+                self.default_value= ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=str_len))
 
         super(String, self).__init__(name=name, default_value=self.default_value, *args, **kwargs)
 
@@ -225,10 +225,10 @@ class String(boofuzz.Fuzzable):
                 current_val = default_value
             else:
                 if patterns:
-                    current_val = exrex.getone(patterns[0], limit=self.max_val)
+                    current_val = exrex.getone(patterns[0])
                 else:
-                    len = random.randint(self.min_val, self.max_val)
-                    current_val = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=len))
+                    str_len = random.randint(self.min_val, self.max_val)
+                    current_val = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=str_len))
 
             if last_val == current_val:
                 continue
