@@ -206,6 +206,7 @@ class String(boofuzz.Fuzzable):
         self.default_value = default_value
         if default_value is None:
             if patterns:
+                print(patterns[0])
                 self.default_value = exrex.getone(patterns[0])
             else:
                 str_len = random.randint(self.min_val, self.max_val)
@@ -371,12 +372,32 @@ class UInt64(Int):
         super(UInt64, self).__init__(name=name, default_value=default_value, min_val=min_val, max_val=max_val,
                 max_mutations=max_mutations, seed=seed, *args, **kwargs)
 
+class Union(boofuzz.Fuzzable):
+    def __init__(
+        self,
+        name=None,
+        children=[],
+        seed=None,
+        *args,
+        **kwargs
+    ):
+
+        self.children = children
+        super(Union, self).__init__(name=name, *args, **kwargs)
+
+    def mutations(self, default_value):
+        child = random.choice(self.children)
+        return child.mutations(child.default_value)
+
+    def encode (self, value, mutation_context=None):
+        return value.encode()
+
 yang_boofuzz_map = {libyang.Type.INT8: Int8,
             libyang.Type.INT16: Int16,
             libyang.Type.INT32: Int32,
             libyang.Type.INT64: Int64,
             libyang.Type.STRING: String,
-            libyang.Type.UNION: boofuzz.RandomData,
+            libyang.Type.UNION: Union,
             libyang.Type.UINT8: UInt8,
             libyang.Type.UINT16: UInt16,
             libyang.Type.UINT32: UInt32,

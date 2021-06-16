@@ -129,18 +129,29 @@ class ModuleParser:
 
     def handle_data_node_type(self, node):
         node_type = node.type()
-        max_val, min_val, patterns = self.handle_data_restriction_stmts(node_type)
+
+        if node_type.base() == libyang.Type.UNION:
+            return self.handle_union_node(node_type, node.name())
+        else:
+            return self.handle_primitive_node(node_type, node.name())
+
+    def handle_primitive_node(self, node, name):
+        max_val, min_val, patterns = self.handle_data_restriction_stmts(node)
 
         if min_val and max_val:
             if patterns:
-                return yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data", min_val=min_val, max_val=max_val, patterns=patterns)
+                return yangprimitives.yang_boofuzz_map[node.base()](name=name + "data", min_val=min_val, max_val=max_val, patterns=patterns)
             else:
-                return yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data", min_val=min_val, max_val=max_val)
+                return yangprimitives.yang_boofuzz_map[node.base()](name=name+ "data", min_val=min_val, max_val=max_val)
         else:
             if patterns:
-                return yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data", patterns=patterns)
+                return yangprimitives.yang_boofuzz_map[node.base()](name=name + "data", patterns=patterns)
             else:
-                return yangprimitives.yang_boofuzz_map[node_type.base()](name=node.name() + "data")
+                return yangprimitives.yang_boofuzz_map[node.base()](name=name + "data")
+
+    def handle_union_node(self, node, name):
+        children = [self.handle_primitive_node(n, name + "child" + str(i)) for i, n in enumerate(node.union_types())]
+        return yangprimitives.yang_boofuzz_map[libyang.Type.UNION](name=name + "data", children=children)
 
     def handle_data_restriction_stmts(self, node_type):
         max_val = None
