@@ -2,6 +2,7 @@ import boofuzz
 import random
 import libyang
 import string
+import exrex
 
 class Int(boofuzz.Fuzzable):
     def __init__(
@@ -191,6 +192,7 @@ class String(boofuzz.Fuzzable):
             default_value=None,
             min_val=10,
             max_val=256,
+            patterns=None,
             max_mutations=1,
             seed=None,
             *args,
@@ -203,8 +205,11 @@ class String(boofuzz.Fuzzable):
 
         self.default_value = default_value
         if default_value is None:
-            len = random.randint(self.min_val, self.max_val)
-            self.default_value= ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=len))
+            if patterns:
+                self.default_value = exrex.getone(patterns[0], limit=self.max_val)
+            else:
+                len = random.randint(self.min_val, self.max_val)
+                self.default_value= ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=len))
 
         super(String, self).__init__(name=name, default_value=self.default_value, *args, **kwargs)
 
@@ -219,8 +224,11 @@ class String(boofuzz.Fuzzable):
             if i == 0:
                 current_val = default_value
             else:
-                len = random.randint(self.min_val, self.max_val)
-                current_val = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=len))
+                if patterns:
+                    current_val = exrex.getone(patterns[0], limit=self.max_val)
+                else:
+                    len = random.randint(self.min_val, self.max_val)
+                    current_val = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=len))
 
             if last_val == current_val:
                 continue

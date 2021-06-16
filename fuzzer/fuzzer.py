@@ -104,6 +104,7 @@ class ModuleParser:
         res = []
         max_val = None
         min_val = None
+        patterns = None
 
         res.append(boofuzz.Static(default_value="<" + node.name() + ">"))
 
@@ -118,10 +119,19 @@ class ModuleParser:
             min_val = length[0]
             max_val = length[1]
 
+        if any(node_type.patterns()):
+            patterns = list(node_type.patterns())[0]
+
         if min_val and max_val:
-            res.append(yangprimitives.yang_boofuzz_map[node_type.base()](min_val=min_val, max_val=max_val))
+            if patterns:
+                res.append(yangprimitives.yang_boofuzz_map[node_type.base()](min_val=min_val, max_val=max_val, patterns=patterns))
+            else:
+                res.append(yangprimitives.yang_boofuzz_map[node_type.base()](min_val=min_val, max_val=max_val))
         else:
-            res.append(yangprimitives.yang_boofuzz_map[node_type.base()]())
+            if patterns:
+                res.append(yangprimitives.yang_boofuzz_map[node_type.base()](patterns=patterns))
+            else:
+                res.append(yangprimitives.yang_boofuzz_map[node_type.base()]())
 
         res.append(boofuzz.String(default_value=""))
         res.append(boofuzz.Static(default_value="</" + node.name() + ">"))

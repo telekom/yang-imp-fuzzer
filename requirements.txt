@@ -4,3 +4,4 @@
 
 libyang==1.6.1
 xmltodict==0.12.0
+exrex==0.10.5
