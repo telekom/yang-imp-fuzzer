@@ -8,10 +8,11 @@ import sys
 import yangprimitives
 
 class ModuleParser:
-    def __init__(self, modules_dir, module_path, namespace, capabilities, conn):
+    def __init__(self, modules_dir, module_path, namespace, capabilities, conn, fuzz_xpath):
         self.module_path = module_path
         self.namespace = namespace
         self.conn = conn
+        self.fuzz_xpath = fuzz_xpath
 
         self.ctx = libyang.Context(modules_dir)
         self.module = self.ctx.load_module(module_path)
@@ -71,12 +72,22 @@ class ModuleParser:
         return features.split(",")
 
     def parse_module(self):
-        return [self.parse_top_level_node(c) for c in self.module.children() if not c.config_false()]
+        nodes = []
+        for c in self.module.children():
+            if not c.config_false():
+                node = self.parse_top_level_node(c)
+                if node is not None:
+                    nodes.append(node)
+
+        return nodes
 
     def parse_top_level_node(self, node):
         config_start = boofuzz.Static(default_value="""<nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">""")
         config_end = boofuzz.Static(default_value="</nc:config>")
         res = [] 
+
+        if self.fuzz_xpath is not None and node.data_path() not in self.fuzz_xpath:
+            return None
 
         if node.keyword() in ['container', 'list', 'rpc']:
             res.append(config_start)
@@ -93,6 +104,9 @@ class ModuleParser:
         config_end = boofuzz.Static(default_value="</nc:config>")
         res = [] 
 
+        if self.fuzz_xpath is not None and node.data_path() not in self.fuzz_xpath:
+            return res
+
         if node.keyword() in ['container', 'list', 'rpc']:
             res.extend(self.parse_container_node(node, False))
         else:
@@ -102,6 +116,9 @@ class ModuleParser:
 
     def parse_container_node(self, node, namespace):
         res = []
+
+        if self.fuzz_xpath is not None and node.data_path() not in self.fuzz_xpath:
+            return res
 
         if namespace:
             res.append(boofuzz.Static(default_value="<" + node.name() + " xmlns=\"" + self.namespace + "\">"))
@@ -119,6 +136,9 @@ class ModuleParser:
 
     def parse_data_node(self, node):
         res = []
+
+        if self.fuzz_xpath is not None and node.data_path() not in self.fuzz_xpath:
+            return res
 
         res.append(boofuzz.Static(name=node.name() + "start", default_value="<" + node.name() + ">"))
         res.append(self.handle_data_node_type(node))
@@ -182,6 +202,7 @@ def parse_args():
     parser.add_argument('--user', dest='user', type=str, default='netconf', help='NETCONF target username')
     parser.add_argument('--password', dest='password', type=str, default='netconf', help='NETCONF target password')
     parser.add_argument('--datastore', dest='datastore', type=str, default='running', help='NETCONF target datastore to fuzz')
+    parser.add_argument('--fuzz-xpath', dest='fuzz_xpath', type=str, help='XPath selecting node to be fuzzed. If not specified, the whole model is fuzzed')
     return parser.parse_args()
 
 def main():
@@ -193,7 +214,7 @@ def main():
     conn.open()
     raw_conn = conn.get_raw_conn()
     capabilities = raw_conn.server_capabilities
-    parser = ModuleParser(args.modules_dir, args.model_path, args.model_namespace, capabilities, raw_conn)
+    parser = ModuleParser(args.modules_dir, args.model_path, args.model_namespace, capabilities, raw_conn, args.fuzz_xpath)
     nodes = parser.parse_module()
     conn.close()
 
