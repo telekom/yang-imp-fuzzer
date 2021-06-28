@@ -202,6 +202,7 @@ class String(boofuzz.Fuzzable):
         self.max_val = int(max_val)
         self.max_mutations = max_mutations
         self.seed = seed
+        self.patterns = patterns
 
         self.default_value = default_value
         if default_value is None:
@@ -227,8 +228,8 @@ class String(boofuzz.Fuzzable):
             if i == 0:
                 current_val = default_value
             else:
-                if patterns:
-                    pattern = r'{}'.format(patterns[0])
+                if self.patterns:
+                    pattern = r'{}'.format(self.patterns[0])
                     pattern = pattern.replace("\\p{L}", "[a-zA-z]")
                     pattern = pattern.replace("\\p{N}", "\d")
                     current_val = exrex.getone(pattern)
