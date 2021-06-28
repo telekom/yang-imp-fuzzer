@@ -193,7 +193,7 @@ class String(boofuzz.Fuzzable):
             min_val=10,
             max_val=256,
             patterns=None,
-            max_mutations=1,
+            max_mutations=1000,
             seed=None,
             *args,
             **kwargs
