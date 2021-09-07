@@ -38,7 +38,13 @@ Running the fuzzer
 To run the fuzzer, run the following command
 
 ```
-python3 fuzzer/fuzzer.py --model-name ietf-system --model-namespace "urn:test"
+./fuzzer/fuzzer.py --model-name ietf-system --model-namespace "urn:ietf:params:xml:ns:yang:ietf-system" --ip 172.17.0.2 --port 830 --user netconf --password netconf --datastore running"
+```
+
+It might be useful to specify a single XPath to fuzz, for example:
+
+```
+./fuzzer/fuzzer.py --model-name ietf-system --model-namespace "urn:ietf:params:xml:ns:yang:ietf-system" --ip 172.17.0.2 --port 830 --user netconf --password netconf --datastore running --fuzz-xpath "/ietf-system:system/hostname"
 ```
 
 Common errors
