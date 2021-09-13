@@ -208,7 +208,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    conn = boofuzz.NETCONFConnection(args.ip, args.port, args.user, args.password, args.datastore)
+    conn = boofuzz.NETCONFConnection(args.ip, args.port, args.user, args.password, args.datastore, False)
     session = boofuzz.Session(target=boofuzz.Target(connection = conn))
 
     conn.open()
