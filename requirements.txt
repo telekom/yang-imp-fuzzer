@@ -1,7 +1,4 @@
--r ./boofuzz-fork/requirements.txt
-
--e ./boofuzz-fork
-
 libyang==1.6.1
 xmltodict==0.12.0
 exrex==0.10.5
+git+git://github.com/sartura/boofuzz/@netconf_connection#egg=boofuzz[netconf]
