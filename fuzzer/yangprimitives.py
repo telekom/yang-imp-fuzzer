@@ -2,7 +2,7 @@ import boofuzz
 import random
 import libyang
 import string
-import exrex
+import rstr
 
 class Int(boofuzz.Fuzzable):
     def __init__(
@@ -210,7 +210,7 @@ class String(boofuzz.Fuzzable):
                 pattern = r'{}'.format(patterns[0])
                 pattern = pattern.replace("\\p{L}", "[a-zA-z]")
                 pattern = pattern.replace("\\p{N}", "\d")
-                self.default_value = exrex.getone(pattern)
+                self.default_value = rstr.xeger(pattern)
             else:
                 str_len = random.randint(self.min_val, self.max_val)
                 self.default_value= ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=str_len))
@@ -232,7 +232,7 @@ class String(boofuzz.Fuzzable):
                     pattern = r'{}'.format(self.patterns[0])
                     pattern = pattern.replace("\\p{L}", "[a-zA-z]")
                     pattern = pattern.replace("\\p{N}", "\d")
-                    current_val = exrex.getone(pattern)
+                    current_val = rstr.xeger(pattern)
                 else:
                     str_len = random.randint(self.min_val, self.max_val)
                     current_val = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=str_len))

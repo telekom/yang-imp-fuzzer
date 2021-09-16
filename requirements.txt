@@ -1,4 +1,4 @@
 libyang==1.6.1
+rstr==3.0.0
 xmltodict==0.12.0
-exrex==0.10.5
-git+git://github.com/sartura/boofuzz/@netconf_connection#egg=boofuzz[netconf]
+git+git://github.com/sartura/boofuzz/@netconf_connection
