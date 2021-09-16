@@ -406,7 +406,9 @@ class Union(boofuzz.Fuzzable):
     def encode (self, value, mutation_context=None):
         return value.encode()
 
-yang_boofuzz_map = {libyang.Type.INT8: Int8,
+yang_boofuzz_map = {
+            libyang.Type.EMPTY: boofuzz.Static,
+            libyang.Type.INT8: Int8,
             libyang.Type.INT16: Int16,
             libyang.Type.INT32: Int32,
             libyang.Type.INT64: Int64,
