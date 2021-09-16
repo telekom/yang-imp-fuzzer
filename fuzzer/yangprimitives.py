@@ -5,6 +5,45 @@ import string
 import re
 import rstr
 
+class Enum(boofuzz.Fuzzable):
+    def __init__(self,
+            name=None,
+            enum_vals=[""],
+            default_value=None,
+            max_mutations=1000,
+            seed=None,
+            *args,
+            **kwargs
+    ):
+        self.enum_vals = enum_vals
+        self.max_mutations = max_mutations
+        self.seed = seed
+        self.default_value = default_value
+        if default_value is None:
+            self.default_value = random.choice(enum_vals)
+
+        super(Enum, self).__init__(name=name, default_value=str(self.default_value), *args, **kwargs)
+
+    def mutations(self, default_value):
+        last_val = None
+        if self.seed is not None:
+            random.seed(self.seed)
+
+        for i in range(self.max_mutations):
+            if i == 0:
+                current_val = default_value
+            else:
+                current_val = random.choice(self.enum_vals)
+
+            if last_val == current_val:
+                continue
+
+            last_val = current_val
+            yield current_val
+
+    def encode (self, value, mutation_context=None):
+        return value.encode()
+
 class Int(boofuzz.Fuzzable):
     def __init__(
             self,
@@ -408,6 +447,7 @@ class Union(boofuzz.Fuzzable):
 
 yang_boofuzz_map = {
             libyang.Type.EMPTY: boofuzz.Static,
+            libyang.Type.ENUM: Enum,
             libyang.Type.INT8: Int8,
             libyang.Type.INT16: Int16,
             libyang.Type.INT32: Int32,

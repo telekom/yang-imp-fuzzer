@@ -152,6 +152,8 @@ class ModuleParser:
 
         if node_type.base() == libyang.Type.UNION:
             return self.handle_union_node(node_type, node.name())
+        elif node_type.base() == libyang.Type.ENUM:
+            return self.handle_enum_node(node_type, node.name())
         else:
             return self.handle_primitive_node(node_type, node.name())
 
@@ -168,6 +170,10 @@ class ModuleParser:
                 return yangprimitives.yang_boofuzz_map[node.base()](name=name + "data", patterns=patterns)
             else:
                 return yangprimitives.yang_boofuzz_map[node.base()](name=name + "data")
+
+    def handle_enum_node(self, node, name):
+        enum_vals = [e[0] for e in node.all_enums()]
+        return yangprimitives.yang_boofuzz_map[libyang.Type.ENUM](name=name + "data", enum_vals=enum_vals)
 
     def handle_union_node(self, node, name):
         children = [self.handle_primitive_node(n, name + "child" + str(i)) for i, n in enumerate(node.union_types())]
