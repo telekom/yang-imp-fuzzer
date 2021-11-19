@@ -1,115 +1,90 @@
-YANG Validation Fuzzer
-======================
+<h1 align="center">
+    yang-implementation-fuzzer
+</h1>
 
-This project contains a fuzzer that parses a YANG module,
-connects to a NETCONF server and then walks through the YANG model data,
-generating random data and sending it to the NETCONF server,
-to test the validity of it's implementation.
+<p align="center">
+    <a href="/../../commits/" title="Last Commit"><img src="https://img.shields.io/github/last-commit/telekom/yang-imp-fuzzer?style=flat"></a>
+    <a href="/../../issues" title="Open Issues"><img src="https://img.shields.io/github/issues/telekom/yang-imp-fuzzer?style=flat"></a>
+    <a href="./COPYING" title="License"><img src="https://img.shields.io/badge/License-GPL--2.0-blue.svg?style=flat"></a>
+</p>
 
-Dependenices
-===========
+<p align="center">
+  <a href="#how-to-contribute">Contribute</a> •
+  <a href="#licensing">Licensing</a>
+</p>
 
-To install the projects, a few libraries are required.
+This project contains a fuzzer that parses a YANG module, connects to a NETCONF server and then walks through the YANG model data, generating random data and sending it to the NETCONF server, to test the validity of the model implementation.
+
+## Development
+
+To install the project, a few dependencies are required.
 
 * boofuzz
 * ncclient
 * libyang-python
+* rstr
+* xmltodict
 
-Build instructions
-=================
+The process of building the project and retrieving the required dependencies is
+described below.
+
+### Build instruction
 
 To build the project, it's best to use a python venv inside the project.
 
 ```
-git clone git@lab.sartura.hr:sysrepo/yang-validation-fuzzer.git --recurse-submodules
+git clone https://github.com/telekom/yang-imp-fuzzer.git
 
-cd yang-validation-fuzzer
+cd yang-imp-fuzzer
 
 python3 -m venv env
 
 source env/bin/activate
 
 pip3 install -r requirements.txt
+
+pip3 install ncclient
 ```
 
-Running the fuzzer
-=================
+### Running the fuzzer
 
 To run the fuzzer, run the following command
 
 ```
-./fuzzer/fuzzer.py --model-name ietf-system --model-namespace "urn:ietf:params:xml:ns:yang:ietf-system" --ip 172.17.0.2 --port 830 --user netconf --password netconf --datastore running"
+./fuzzer/fuzzer.py --model-name ietf-system --model-namespace "urn:ietf:params:xml:ns:yang:ietf-system" --ip 172.17.0.2 --port 8
+30 --user netconf --password netconf --datastore running"
 ```
 
 It might be useful to specify a single XPath to fuzz, for example:
 
 ```
-./fuzzer/fuzzer.py --model-name ietf-system --model-namespace "urn:ietf:params:xml:ns:yang:ietf-system" --ip 172.17.0.2 --port 830 --user netconf --password netconf --datastore running --fuzz-xpath "/ietf-system:system/hostname"
+./fuzzer/fuzzer.py --model-name ietf-system --model-namespace "urn:ietf:params:xml:ns:yang:ietf-system" --ip 172.17.0.2 --port 8
+30 --user netconf --password netconf --datastore running --fuzz-xpath "/ietf-system:system/hostname"
 ```
 
-Common errors
-=================
-If the target NETCONF server has NACM enabled the following error might appear:
-```
-[2021-09-07 17:25:10,692]   Test Step: Fuzzing Node 'system'
-[2021-09-07 17:25:10,692]     Info: Sending 324 bytes...
-[2021-09-07 17:25:10,892]     Error!!!! Unexpected exception! Traceback (most recent call last):
-                                File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/sessions.py", line 1388, in _main_fuzz_loop
-                                  self._fuzz_current_case(mutation_context)
-                                File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/sessions.py", line 1754, in _fuzz_current_case
-                                  self.transmit_fuzz(
-                                File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/sessions.py", line 1169, in transmit_fuzz
-                                  self.targets[0].send(data)
-                                File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/sessions.py", line 221, in send
-                                  num_sent = self._target_connection.send(data=data)
-                                File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/connections/netconf_connection.py", line 28, in send
-                                  self.conn.edit_config(target=self.datastore, config=data)
-                                File "/home/user/yang-validation-fuzzer/env/lib/python3.9/site-packages/ncclient/manager.py", line 226, in execute
-                                  return cls(self._session,
-                                File "/home/user/yang-validation-fuzzer/env/lib/python3.9/site-packages/ncclient/operations/edit.py", line 69, in request
-                                  return self._request(node)
-                                File "/home/user/yang-validation-fuzzer/env/lib/python3.9/site-packages/ncclient/operations/rpc.py", line 360, in _request
-                                  raise self._reply.error
-                              ncclient.operations.rpc.RPCError: Access to the data model "ietf-system" is denied because "netconf" NACM authorization failed.
+For a list of common issues that might be encountered during fuzzer use check out [common_issues.md](docs/common_issues.md)
 
-Traceback (most recent call last):
-  File "/home/user/yang-validation-fuzzer/./fuzzer/fuzzer.py", line 227, in <module>
-    main()
-  File "/home/user/yang-validation-fuzzer/./fuzzer/fuzzer.py", line 224, in main
-    session.fuzz()
-  File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/sessions.py", line 1264, in fuzz
-    self._main_fuzz_loop(self._generate_mutations_indefinitely(max_depth=max_depth))
-  File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/sessions.py", line 1388, in _main_fuzz_loop
-    self._fuzz_current_case(mutation_context)
-  File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/sessions.py", line 1754, in _fuzz_current_case
-    self.transmit_fuzz(
-  File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/sessions.py", line 1169, in transmit_fuzz
-    self.targets[0].send(data)
-  File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/sessions.py", line 221, in send
-    num_sent = self._target_connection.send(data=data)
-  File "/home/user/yang-validation-fuzzer/boofuzz-fork/boofuzz/connections/netconf_connection.py", line 28, in send
-    self.conn.edit_config(target=self.datastore, config=data)
-  File "/home/user/yang-validation-fuzzer/env/lib/python3.9/site-packages/ncclient/manager.py", line 226, in execute
-    return cls(self._session,
-  File "/home/user/yang-validation-fuzzer/env/lib/python3.9/site-packages/ncclient/operations/edit.py", line 69, in request
-    return self._request(node)
-  File "/home/user/yang-validation-fuzzer/env/lib/python3.9/site-packages/ncclient/operations/rpc.py", line 360, in _request
-    raise self._reply.error
-ncclient.operations.rpc.RPCError: Access to the data model "ietf-system" is denied because "netconf" NACM authorization failed.
-```
+## How to Contribute
 
-In that case either enable the appropriate NACM operations on the server for the user that is used to fuzz, or disable NACM completely.
-In the case of sysrepo and Netopeer2, use the following command will disable NACM:
+Contribution and feedback is encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](./CONTRIBUTING.md). By participating in this project, you agree to abide by its [Code of Conduct](./CODE_OF_CONDUCT.md) at all times.
 
-```
-sysrepocfg -Evim -f json -m ietf-netconf-acm -d running
-```
+### Code of Conduct
 
-Then enter the following data into the datastore:
-```
-{
-    "ietf-netconf-acm:nacm": {
-                "enable-nacm": false
-        }
-}
-```
+This project has adopted the [Contributor Covenant](https://www.contributor-covenant.org/) in version 2.0 as our code of conduct. Please see the details in our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). All contributors must abide by the code of conduct.
+
+### Working Language
+
+We decided to apply _English_ as the primary project language.  
+
+Consequently, all content will be made available primarily in English. We also ask all interested people to use English as language to create issues, in their code (comments, documentation etc.) and when you send requests to us. The application itself and all end-user facing content will be made available in other languages as needed.
+
+## Licensing
+
+Copyright (c) 2021 Deutsche Telekom AG.
+
+Licensed under the **GNU General Public License Version 2.0** (the "License"); you may not use this file except in compliance with the License.
+
+You may obtain a copy of the License by reviewing the file [COPYING](./COPYING) in the repository or by downloading the respective version from  
+[https://www.gnu.org/licenses/](https://www.gnu.org/licenses/)
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the [COPYING](./COPYING) for the specific language governing permissions and limitations under the License.
