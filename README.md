@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="#development">Development</a> •
   <a href="#how-to-contribute">Contribute</a> •
   <a href="#licensing">Licensing</a>
 </p>
