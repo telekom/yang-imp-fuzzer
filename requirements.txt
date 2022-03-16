@@ -1,4 +1,0 @@
-git+git://github.com/jtpereyda/boofuzz@master#egg=boofuzz
-libyang==1.7.0
-rstr==3.0.0
-xmltodict==0.12.0

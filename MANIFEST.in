@@ -1,0 +1,6 @@
+include COPYING
+include AUTHORS
+include CODEOWNERS
+include *.md
+global-exclude *.pyc
+recursive-include docs *.md
