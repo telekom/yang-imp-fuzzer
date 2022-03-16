@@ -25,7 +25,7 @@ import boofuzz
 import libyang
 import xmltodict
 import sys
-import yangprimitives
+import yang_imp_fuzzer.yangprimitives
 
 class ModuleParser:
     def __init__(self, modules_dir, module_path, namespace, capabilities, conn, fuzz_xpath):
@@ -248,6 +248,3 @@ def main():
         session.connect(node)
 
     session.fuzz()
-
-if __name__ == "__main__":
-    main()
