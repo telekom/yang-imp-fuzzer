@@ -73,6 +73,8 @@ class ModuleParser:
             if self.module.name() not in [m['name'] for m in modules]:
                 sys.exit("module not found on remote server")
             for m in modules:
+                if 'feature' not in m:
+                    return []
                 if m['name'] == self.module.name():
                     if isinstance(m['feature'], str):
                         return [m['feature']]
