@@ -25,7 +25,7 @@ import boofuzz
 import libyang
 import xmltodict
 import sys
-import yang_imp_fuzzer.yangprimitives
+import yang_imp_fuzzer.yangprimitives as yangprimitives
 
 class ModuleParser:
     def __init__(self, modules_dir, module_path, namespace, capabilities, conn, fuzz_xpath):
