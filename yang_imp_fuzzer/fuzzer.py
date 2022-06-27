@@ -194,7 +194,7 @@ class ModuleParser:
                 return yangprimitives.yang_boofuzz_map[node.base()](name=name + "data")
 
     def handle_enum_node(self, node, name):
-        enum_vals = [e[0] for e in node.all_enums()]
+        enum_vals = [e for e in node.all_enums()]
         return yangprimitives.yang_boofuzz_map[libyang.Type.ENUM](name=name + "data", enum_vals=enum_vals)
 
     def handle_union_node(self, node, name):
